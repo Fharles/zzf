@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			.container{
+				width: 300px;
+				/*height: 500px;*/
+				border: 10px solid goldenrod;
+				margin: 0 auto;	
+				overflow: hidden;
+			}
+			.screen{
+				height: 80px;
+				border-bottom: 10px solid goldenrod;
+				background: lightblue;
+				text-align: right;
+				display: table-cell;
+				width: 300px;
+				vertical-align: bottom;
+			}
+			.clear_float:before,.clear_float:after{
+				content: "";
+				display: table;
+			}
+			.clear_float:after{
+				clear: both;
+			}
+			ul{
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.wrap{
+				background: lightgray;
+				/*height: 410px;*/
+				padding-bottom: 20px;
+			}
+			.wrap>ul:nth-child(1){
+				width:250px;
+				height: 100%;
+				float: left;
+				margin-top: 20px;
+			}
+			.wrap>ul:nth-child(2){
+				width:50px;
+				height: 100%;
+				float: left;
+				margin-top: 20px;
+			}
+			li{
+				border-radius: 50%;
+				background: white;
+				text-align: center;
+				line-height: 70px;
+			}
+			.wrap>ul:nth-child(1)>li{
+				width: 70px;
+				height: 70px;
+				float: left;
+			}
+			.wrap>ul:nth-child(1)>li+li{
+				margin-left: 10px;
+			}
+			.wrap>ul:nth-child(1)>li:nth-child(3n+1){
+				margin-left: 5px;
+			}
+			.wrap>ul:nth-child(2)>li{
+				width: 40px;
+				height: 40px;
+				line-height: 40px;
+			}
+			.wrap>ul:nth-child(2)>li+li{
+				margin-top: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="screen"></div>
+			<div class="wrap clear_float">
+				<ul class="clear_float">
+					<li class="nums">7</li>
+					<li class="nums">8</li>
+					<li class="nums">9</li>
+					<li class="nums">4</li>
+					<li class="nums">5</li>
+					<li class="nums">6</li>
+					<li class="nums">1</li>
+					<li class="nums">2</li>
+					<li class="nums">3</li>
+					<li class="nums">0</li>
+					<li class="dot">.</li>
+					<li class="clear_data">c</li>
+				</ul>
+				<ul>
+					<li class="operators">/</li>
+					<li class="operators">*</li>
+					<li class="operators">-</li>
+					<li class="operators">+</li>
+					<li class="equal">＝</li>
+				</ul>
+			</div>
+		</div>
+		<script type="text/javascript">
+			//获取元素
+			var nums = document.querySelectorAll(".nums");//所有的数字键；
+			var ops = document.querySelectorAll(".operators");//所有的运算符；
+			var equal = document.querySelector(".equal");//等于号；
+			var dot = document.querySelector(".dot");//点键
+			var clear_data = document.querySelector(".clear_data");//清除键
+			var show = document.querySelector(".screen");//显示框口
+			
+			//可能用到的变量；
+			var dataB =0;//存储后台数据；
+			var pre_nums =false;//上一步是否是数字；
+			var pre_ops = false;//上一步是否运算符；
+			var pre_dot = false;//上一步是否是点；
+			var pre_equal = false;//上一步是否是等于号；
+			var ops_save = null;//用来存储运算符；
+			var has_ops = false;//判断之前是否有运算操作；
+			var has_dot = false;//判断之前是否有点；
+			var show_data = 0;//存储屏幕的显示数字；
+			var equal_data=0;//存储连续等于号时的后台数据；
+			
+			
+			show.innerText = show_data;
+			
+			//给数字键添加点击事件；
+			for(var i=0;i<nums.length;i++){
+				nums[i].onclick = function(){
+					if(pre_nums){
+						//如果点击这个数字时，上一步是数字
+						
+						show_data+=this.innerText;
+						if(has_dot){
+							show.innerText = show_data;
+						}else{
+							show.innerText = parseFloat(show_data);
+						}
+						
+					}else if(pre_ops){
+						//如果点击这个数字时，上一步是运算符；
+						show_data = this.innerText;
+						show.innerText = parseFloat(show_data);
+					}else if(pre_dot){
+						//如果点击这个数字时，上一步是点号；
+						show_data+=this.innerText;
+						show.innerText = show_data;
+					}else if(pre_equal){
+						show_data = this.innerText;
+						show.innerText = parseFloat(show_data);//
+					}else{
+						//点数字之前什么都没有点
+						show_data = this.innerText;
+						show.innerText = parseFloat(show_data);
+					}
+					
+					
+					
+					
+					
+					
+					equal_data = parseFloat(show_data);
+					pre_nums = true;
+					pre_dot = false;
+					pre_equal = false;
+					pre_ops = false;
+					console.log(dataB,equal_data);
+				}
+			}
+			
+			
+			
+			//给所有运算符添加点击事件；
+			for(var i=0;i<ops.length;i++){
+				ops[i].onclick = function(){
+					if(pre_nums){
+						if(has_ops){
+							switch(ops_save){
+								case "+":
+								show_data = parseFloat(dataB)+parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+								case "-":
+								show_data = parseFloat(dataB)-parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+								case "*":
+								show_data = parseFloat(dataB)*parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+								case "/":
+								show_data = parseFloat(dataB)/parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+							}
+						}
+						
+						
+					}
+					
+					
+					
+					
+					
+					//
+//					equal_data = parseFloat(dataB);
+					has_ops=true;
+					dataB = parseFloat(show_data);
+					ops_save = this.innerText;
+					has_dot =false;
+					pre_nums = false;
+					pre_dot = false;
+					pre_equal = false;
+					pre_ops = true;	
+					console.log(dataB,equal_data);
+				}
+			}
+			
+			
+			
+			//给dot添加点击事件；
+			dot.onclick = function(){
+				if(pre_nums){
+					if(has_dot){
+						//不做任何操作；
+					}else{
+						show_data= parseFloat(show_data)+this.innerText;
+						show.innerText = show_data;
+					}
+				}else if(pre_dot){
+					has_dot = true;
+				}else if(pre_ops||pre_equal){
+					has_dot = true;
+					show_data=0+this.innerText;
+					show.innerText = parseFloat(show_data);
+				}else{
+					//点击点之前什么操作都没做；
+					show_data+=this.innerText;
+					show.innerText =show_data;
+				}
+				
+				
+				
+				
+				
+				has_dot = true;
+				pre_nums = false;
+				pre_dot = true;
+				pre_equal = false;
+				pre_ops = false;
+			}
+			
+			//equal等于号添加点击事件
+			equal.onclick = function(){
+				if(pre_nums){
+					if(has_ops){
+						switch(ops_save){
+								case "+":
+								show_data = parseFloat(dataB)+parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+								case "-":
+								show_data = parseFloat(dataB)-parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+								case "*":
+								show_data = parseFloat(dataB)*parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+								case "/":
+								show_data = parseFloat(dataB)/parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+							}
+					}
+				}else if(pre_equal&&has_ops){
+					switch(ops_save){
+								case "+":
+								show_data = parseFloat(equal_data)+parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+								case "-":
+								show_data = parseFloat(show_data)-parseFloat(equal_data);
+								show.innerText = show_data;
+								break;
+								case "*":
+								show_data = parseFloat(equal_data)*parseFloat(show_data);
+								show.innerText = show_data;
+								break;
+								case "/":
+								show_data = parseFloat(show_data)/parseFloat(equal_data);
+								show.innerText = show_data;
+								break;
+							}
+				}
+				
+				
+				
+				
+				
+				has_dot = false;
+				pre_nums = false;
+				pre_dot = false;
+				pre_equal = true;
+				pre_ops = false;
+				console.log(dataB,equal_data);
+			}
+			
+			clear_data.onclick = function(){
+				dataB=0;
+				equal_data=0;
+				has_dot=false;
+				has_ops =false;
+				pre_dot=false;
+				pre_equal=false;
+				pre_nums = false;
+				pre_ops = false;
+				show_data =0;
+				show.innerText = show_data;
+			}
+		</script>
+	</body>	
+</html>
